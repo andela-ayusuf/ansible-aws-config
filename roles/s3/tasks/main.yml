@@ -1,0 +1,16 @@
+---
+- name: Create an S3 bucket
+  s3: 
+    bucket: abdulmalik
+    mode: create 
+    permission: public-read
+    region: us-east-1
+    aws_access_key: "{{aws_access_key}}"
+    aws_secret_key: "{{aws_secret_key}}"
+
+- name: Encrypt the S3 bucket with a bucket policy
+  s3_bucket:
+    name: abdulmalik
+    policy: "{{lookup('file','policy.json')}}"
+    aws_access_key: "{{aws_access_key}}"
+    aws_secret_key: "{{aws_secret_key}}"
