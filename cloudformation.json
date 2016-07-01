@@ -75,6 +75,22 @@
         "SubnetId" : { "Ref" : "PublicSubnet" },
         "RouteTableId" : { "Ref" : "PublicRouteTable" }
       }
+    },
+    
+    "PublicInstance": {
+      "Type": "AWS::EC2::Instance",
+      "DependsOn": "GatewayToInternet",
+      "Properties": {
+        "InstanceType": "t2.micro",
+        "ImageId": "ami-31490d51",
+        "NetworkInterfaces": [{
+          "AssociatePublicIpAddress": "true",
+          "DeviceIndex": "0",
+          "DeleteOnTermination": "true",
+          "SubnetId": { "Ref": "PublicSubnet" }
+        }]
+      }
     }
+
   }
 }

@@ -5,6 +5,7 @@
     state: "present"
     region: "us-west-1"
     disable_rollback: false
-    template: "cloudformation.template"
+    template: "cloudformation.json"
     aws_access_key: "{{aws_access_key}}"
     aws_secret_key: "{{aws_secret_key}}"
+  register: cloudformation
