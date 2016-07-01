@@ -1,0 +1,14 @@
+---
+- name: Create an AMI from the instance created from the cloudformation template
+  ec2_ami:
+    aws_access_key: "{{aws_access_key}}"
+    aws_secret_key: "{{aws_secret_key}}"
+    instance_id: "{{cloudformation.stack_resources[3].physical_resource_id}}"
+    region: us-west-1
+    wait: yes
+    name: abdulmalik
+    tags:
+      Name: abdulmalik
+  register: ami
+
+- debug: var=ami

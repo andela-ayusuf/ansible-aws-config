@@ -6,3 +6,4 @@
   roles:
   - {role: s3}
   - {role: cloudformation}
+  - {role: ami}
