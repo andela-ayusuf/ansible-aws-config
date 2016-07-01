@@ -14,3 +14,18 @@
     policy: "{{lookup('file','policy.json')}}"
     aws_access_key: "{{aws_access_key}}"
     aws_secret_key: "{{aws_secret_key}}"
+
+- name: Upload data to the encrypted S3 bucket
+  s3:
+    bucket: abdulmalik
+    mode: put
+    encrypt: yes
+    aws_access_key: "{{aws_access_key}}"
+    aws_secret_key: "{{aws_secret_key}}"
+    object: "{{item.object}}"
+    src: "{{item.src}}"
+  with_items:
+    - {object: index.html, src: index.html}
+    - {object: pic1.png, src: pic1.png}
+    - {object: pic2.png, src: pic2.png}
+    - {object: pic3.png, src: pic3.png}

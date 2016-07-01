@@ -1,0 +1,10 @@
+---
+- name: Create a VPC with a private & public subnet using AWS Cloudformation
+  cloudformation:
+    stack_name: "abdulmalik-cloudformation"
+    state: "present"
+    region: "us-west-1"
+    disable_rollback: false
+    template: "cloudformation.template"
+    aws_access_key: "{{aws_access_key}}"
+    aws_secret_key: "{{aws_secret_key}}"

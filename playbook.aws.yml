@@ -5,3 +5,4 @@
   - "vars/vars.yml"
   roles:
   - {role: s3}
+  - {role: cloudformation}
