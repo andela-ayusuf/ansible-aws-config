@@ -1,0 +1,37 @@
+---
+- name: Check if Boto is installed
+  command: bash -c "pip list | grep 'boto '"
+  register: boto_installed
+  ignore_errors: True
+
+- name: Install Boto if its uninstalled
+  pip: name=boto state=present
+  when: boto_installed|failed
+
+- name: Check if AWS CLI is installed
+  command: bash -c "aws --version 2>&1 | grep aws-cli*"
+  register: aws_cli_installed
+  ignore_errors: True
+
+- name: Install AWS CLI if its uninstalled
+  pip: name=awscli state=present
+  when: aws_cli_installed|failed
+
+- name: Create .aws directory under user home for AWS CLI config 
+  file:  
+    path: "{{ansible_env.HOME}}/.aws"
+    state: directory
+    owner: "{{ANSIBLE_USER}}"
+    mode: 0755
+  when: aws_cli_installed|failed
+
+- name: Copy AWS CLI config and credentials to machine using templates
+  template:  
+    src: "{{item}}.j2"
+    dest: "{{ansible_env.HOME}}/.aws/{{item}}"
+    owner: "{{ANSIBLE_USER}}"
+    mode: 0644
+  with_items:
+    - config
+    - credentials
+  when: aws_cli_installed|failed
