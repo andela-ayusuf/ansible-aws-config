@@ -1,23 +1,23 @@
 ---
 - name: Create an S3 bucket
   s3: 
-    bucket: abdulmalik
+    bucket: "{{s3_bucket_name}}"
     mode: create 
     permission: public-read
-    region: us-west-1
+    region: "{{region}}"
     aws_access_key: "{{aws_access_key}}"
     aws_secret_key: "{{aws_secret_key}}"
 
 - name: Encrypt the S3 bucket with a bucket policy
   s3_bucket:
-    name: abdulmalik
-    policy: "{{lookup('file','policy.json')}}"
+    name: "{{s3_bucket_name}}"
+    policy: "{{lookup('file','{{s3_bucket_policy}}')}}"
     aws_access_key: "{{aws_access_key}}"
     aws_secret_key: "{{aws_secret_key}}"
 
 - name: Upload data to the encrypted S3 bucket
   s3:
-    bucket: abdulmalik
+    bucket: "{{s3_bucket_name}}"
     mode: put
     encrypt: yes
     aws_access_key: "{{aws_access_key}}"
@@ -26,6 +26,7 @@
     src: "{{item.src}}"
   with_items:
     - {object: index.html, src: index.html}
-    - {object: pic1.png, src: pic1.png}
-    - {object: pic2.png, src: pic2.png}
-    - {object: pic3.png, src: pic3.png}
+    - {object: error.html, src: error.html}
+
+- name: Set up the static website
+  command: "aws s3 website s3://www.{{s3_bucket_name}}/ --index-document index.html --error-document error.html"

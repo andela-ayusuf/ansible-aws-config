@@ -4,6 +4,8 @@
   vars_files:
   - "vars/vars.yml"
   roles:
-  - {role: s3}
-  - {role: cloudformation}
-  - {role: ami}
+  - setup
+  - s3
+  - cloudformation
+  - ami
+  - asg
