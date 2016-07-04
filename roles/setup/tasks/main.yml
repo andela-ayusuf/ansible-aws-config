@@ -21,15 +21,15 @@
   file:  
     path: "{{ansible_env.HOME}}/.aws"
     state: directory
-    owner: "{{ANSIBLE_USER}}"
+    owner: "{{ansible_user}}"
     mode: 0755
   when: aws_cli_installed|failed
 
 - name: Copy AWS CLI config and credentials to machine using templates
   template:  
-    src: "{{item}}.j2"
+    src: "roles/setup/templates/{{item}}.j2"
     dest: "{{ansible_env.HOME}}/.aws/{{item}}"
-    owner: "{{ANSIBLE_USER}}"
+    owner: "{{ansible_user}}"
     mode: 0644
   with_items:
     - config
