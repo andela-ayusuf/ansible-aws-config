@@ -11,7 +11,7 @@
 - name: Encrypt the S3 bucket with a bucket policy
   s3_bucket:
     name: "{{s3_bucket_name}}"
-    policy: "{{lookup('file','{{s3_bucket_policy}}')}}"
+    policy: "{{lookup('file','policy.json')}}"
     aws_access_key: "{{aws_access_key}}"
     aws_secret_key: "{{aws_secret_key}}"
 
@@ -20,13 +20,14 @@
     bucket: "{{s3_bucket_name}}"
     mode: put
     encrypt: yes
+    permission: public-read
     aws_access_key: "{{aws_access_key}}"
     aws_secret_key: "{{aws_secret_key}}"
     object: "{{item.object}}"
     src: "{{item.src}}"
   with_items:
-    - {object: index.html, src: index.html}
-    - {object: error.html, src: error.html}
+    - {object: index.html, src: roles/s3/files/index.html}
+    - {object: error.html, src: roles/s3/files/error.html}
 
 - name: Set up the static website
-  command: "aws s3 website s3://www.{{s3_bucket_name}}/ --index-document index.html --error-document error.html"
+  command: "aws s3 website s3://{{s3_bucket_name}}/ --index-document index.html --error-document error.html"
