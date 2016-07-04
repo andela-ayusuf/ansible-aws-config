@@ -1,0 +1,11 @@
+aws_access_key: AWS-ACCESS-KEYS
+aws_secret_key: AWS-SECRET-KEYS
+ami_name: AMI-NAME
+ami_tag: AMI-NAME-TAG
+launch_config_name: LAUNCH-CONFIG-NAME
+asg_name: AUTO-SCALING-GROUP-NAME
+region: AWS-REGION
+cf_stack_name: CLOUD-FORMATION-STACK-NAME
+cf_tag: CLOUD-FORMATION-STACK-NAME-TAG
+s3_bucket_name: UNIQUE-S3-BUCKET-NAME
+ansible_user: LOCAL-MACHINE-USERNAME
