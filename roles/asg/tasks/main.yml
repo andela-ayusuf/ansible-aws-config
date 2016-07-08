@@ -1,4 +1,9 @@
 ---
+- name: Check if a launch configuration with the same name as the launch_config_name variable already exists
+  command: bash -c "aws autoscaling describe-launch-configurations --launch-configuration-names | grep '{{launch_config_name}}'"
+  register: launch_config_created
+  ignore_errors: true
+
 - name: Create launch configuration using the ami created
   ec2_lc:
     name: "{{launch_config_name}}"
@@ -8,6 +13,7 @@
     assign_public_ip: no
     aws_access_key: "{{aws_access_key}}"
     aws_secret_key: "{{aws_secret_key}}"
+  when: launch_config_created|failed
 
 - name: Create an auto scaling group from the launch config above
   ec2_asg:
@@ -24,3 +30,4 @@
     aws_secret_key: "{{aws_secret_key}}"
     tags:
     - environment: dev
+  when: launch_config_created|failed
