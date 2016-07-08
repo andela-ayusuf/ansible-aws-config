@@ -25,9 +25,9 @@ In order to create a Server-Side Encryption with Amazon S3-Managed Encryption Ke
 The policy will be placed in the root of the project in a file named **policy.json**
 
 
-**Variables**
+**Variables and AWS Access and Secret Keys**
 
-We will also need to update the **vars.yml** file with the appropriate variables.
+In the variables files i.e. the **vars.yml** file in the root directory of this project, we will need to enter our Access and Secret Keys which can be obtained from AWS [here](https://console.aws.amazon.com/iam/home?region=us-west-1#home). It is also required that we fill in other variables which will be used in creating our AWS resources.
 
 **Running The Project**
 
