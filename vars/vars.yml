@@ -1,11 +1,30 @@
-aws_access_key: AWS-ACCESS-KEYS
-aws_secret_key: AWS-SECRET-KEYS
-ami_name: AMI-NAME
-ami_tag: AMI-NAME-TAG
-launch_config_name: LAUNCH-CONFIG-NAME
-asg_name: AUTO-SCALING-GROUP-NAME
-region: AWS-REGION
-cf_stack_name: CLOUD-FORMATION-STACK-NAME
-cf_tag: CLOUD-FORMATION-STACK-NAME-TAG
-s3_bucket_name: UNIQUE-S3-BUCKET-NAME
-ansible_user: LOCAL-MACHINE-USERNAME
+ami_name: AMI_NAME
+asg_desired_capacity: AUTO SCALING GROUP DESIRED CAPACITY
+asg_max_size: AUTO SCALING GROUP MAX SIZE
+asg_min_size: AUTO SCALING GROUP MIN SIZE
+availability_zone1: AZ ONE
+availability_zone2: AZ TWO
+aws_access_key: "AWS ACCESS KEY"
+aws_secret_key: "AWS SECRET KEY"
+bucket_name: S3 BUCKET NAME
+cf_stack_name: CLOUD FORMATION STACK NAME
+cf_tag: CLOUD FORMATION STACK NAME TAG
+configured_instance_id: CONFIGURED INSTANCE NAME 
+email: EMAIL
+error_doc: INDEX DOCUMENT NAME
+index_doc: ERROR DOCUMENT NAME
+key_pair_name: EC2 KEY PAIR
+launch_config_instance_type: EC2 INSTANCE TYPE
+load_balancer_name: ELASTIC LOAD BALANCER NAME
+network_acl_cidr: NACL CIDR
+pub_subnet1_cidr: PUBLIC SUBNET1 CIDR
+pub_subnet2_cidr: PUBLIC SUBNET2 CIDR
+pri_subnet_cidr: PRIVATE SUBNET CIDR
+region: AWS REGION
+route_table_cidr: 0.0.0.0/0
+security_group_cidr: SECURITY GROUP CIDR
+sns_topic_name: SNS TOPIC NAME
+vpc_cidr: VPC CIDR
+
+
+
