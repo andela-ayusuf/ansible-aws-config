@@ -29,12 +29,6 @@ When(/^I convert cloudformation template from j2 to json$/) do
   output, error, @status = Open3.capture3 "#{cmd}"
 end
 
-# Scenario: Copy ami ID to the json file
-When(/^I copy ami ID to the json file$/) do
-  cmd = "ansible-playbook playbook.aws.yml --tags 'ami_json'"
-  output, error, @status = Open3.capture3 "#{cmd}"
-end
-
 # Scenario: Configure AWS infrastructure using Cloudformation
 When(/^I configure AWS infrastructure using Cloudformation$/) do
   cmd = "ansible-playbook playbook.aws.yml --tags 'cloudformation'"
@@ -60,6 +54,34 @@ And(/^the created Simple Notification Service should exists on AWS$/) do
   output, error, status = Open3.capture3 "#{cmd}"
   expect(status.success?).to eq(true)
   expect(output).to match("#{SNSTOPICNAME}")
+end
+
+And(/^the Launch Config should exists on AWS$/) do
+  cmd = "aws cloudformation list-stack-resources --stack-name #{CFSTACKNAME} | grep LaunchConfig"
+  output, error, status = Open3.capture3 "#{cmd}"
+  expect(status.success?).to eq(true)
+  expect(output).to match("LaunchConfig")
+end
+
+And(/^the Private Subnet should exists on AWS$/) do
+  cmd = "aws cloudformation list-stack-resources --stack-name #{CFSTACKNAME} | grep PrivateSubnet"
+  output, error, status = Open3.capture3 "#{cmd}"
+  expect(status.success?).to eq(true)
+  expect(output).to match("PrivateSubnet")
+end
+
+And(/^the Public Subnet should exists on AWS$/) do
+  cmd = "aws cloudformation list-stack-resources --stack-name #{CFSTACKNAME} | grep PublicSubnet"
+  output, error, status = Open3.capture3 "#{cmd}"
+  expect(status.success?).to eq(true)
+  expect(output).to match("PublicSubnet")
+end
+
+And(/^the Public Subnet2 should exists on AWS$/) do
+  cmd = "aws cloudformation list-stack-resources --stack-name #{CFSTACKNAME} | grep PublicSubnet2"
+  output, error, status = Open3.capture3 "#{cmd}"
+  expect(status.success?).to eq(true)
+  expect(output).to match("PublicSubnet2")
 end
 
 # Scenario: Upload data to the S3 bucket
