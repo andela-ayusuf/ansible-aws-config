@@ -1,18 +1,19 @@
 ---
 - name: Check if an AMI with the same name as the ami_name variable already exists
-  command: bash -c "aws ec2 describe-images --filters Name=name,Values={{ami_name}} --query 'Images[*].{ID:ImageId}'"
+  command: bash -c "aws ec2 describe-images --filters Name=name,Values={{ ami_name }} --query 'Images[*].{ID:ImageId}' | grep ami"
   register: ami_created
   ignore_errors: true
+  tags:
+    - create_ami
 
-- name: Create an AMI from the instance created from the cloudformation template
+- name: Create an AMI from the instance given
   ec2_ami:
-    aws_access_key: "{{aws_access_key}}"
-    aws_secret_key: "{{aws_secret_key}}"
-    instance_id: "{{cloudformation.stack_resources[3].physical_resource_id}}"
-    region: "{{region}}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    instance_id: "{{ configured_instance_id }}"
+    region: "{{ region }}"
     wait: yes
-    name: "{{ami_name}}"
-    tags:
-      Name: "{{ami_tag}}"
-  register: ami
+    name: "{{ ami_name }}"
   when: ami_created|failed
+  tags:
+    - create_ami

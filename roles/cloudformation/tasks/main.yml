@@ -1,15 +1,39 @@
 ---
-- name: Create a VPC with a private & public subnet using AWS Cloudformation
+- name: Convert cloudformation template from j2 to json
+  local_action: template src=roles/cloudformation/templates/cloudformation.json.j2 dest=roles/cloudformation/templates/cloudformation.json
+  tags:
+    - j2_json
+
+- name: Pause playbook to allow previously created ami ID to propagate
+  pause: minutes=1
+  tags:
+    - ami_json
+
+- name: Get created ami's ID
+  shell: aws ec2 describe-images --filters Name=name,Values={{ ami_name }} --query 'Images[*].{ID:ImageId}' |  tr -d '[{"ID:"}]' | tr -d ' \n'
+  register: ami_id
+  tags:
+    - ami_json
+
+- name: Copy ami ID to the json file
+  local_action: replace 
+    dest=roles/cloudformation/templates/cloudformation.json
+    regexp=""ImageId":"ami_id""
+    replace=""ImageId"{{':'}} "{{ ami_id.stdout }}""
+  tags:
+    - ami_json
+
+- name: Configure AWS infrastructure using Cloudformation
   cloudformation:
-    stack_name: "{{cf_stack_name}}"
+    stack_name: "{{ cf_stack_name }}"
     state: "present"
     region: "{{region}}"
     disable_rollback: false
     template: "roles/cloudformation/templates/cloudformation.json"
-    aws_access_key: "{{aws_access_key}}"
-    aws_secret_key: "{{aws_secret_key}}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
     tags:
       Stack: "{{cf_tag}}"
   register: cloudformation
-
-- debug: var=cloudformation
+  tags:
+    - cloudformation

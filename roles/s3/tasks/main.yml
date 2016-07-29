@@ -1,23 +1,17 @@
 ---
-- name: Create an S3 bucket
-  s3: 
-    bucket: "{{s3_bucket_name}}"
-    mode: create 
-    permission: public-read
-    region: "{{region}}"
-    aws_access_key: "{{aws_access_key}}"
-    aws_secret_key: "{{aws_secret_key}}"
-
-- name: Encrypt the S3 bucket with a bucket policy
-  s3_bucket:
-    name: "{{s3_bucket_name}}"
-    policy: "{{lookup('file','policy.json')}}"
-    aws_access_key: "{{aws_access_key}}"
-    aws_secret_key: "{{aws_secret_key}}"
+- name: Check if data has been uploaded to S3 bucket
+  command: bash -c "aws s3 ls s3://{{ bucket_name }} | grep {{ item }}"
+  with_items:
+    - index.html
+    - error.html
+  register: data_uploaded
+  ignore_errors: True
+  tags:
+    - s3_upload
 
 - name: Upload data to the encrypted S3 bucket
   s3:
-    bucket: "{{s3_bucket_name}}"
+    bucket: "{{ bucket_name }}"
     mode: put
     encrypt: yes
     permission: public-read
@@ -28,6 +22,6 @@
   with_items:
     - {object: index.html, src: roles/s3/files/index.html}
     - {object: error.html, src: roles/s3/files/error.html}
-
-- name: Set up the static website
-  command: "aws s3 website s3://{{s3_bucket_name}}/ --index-document index.html --error-document error.html"
+  when: data_uploaded|failed
+  tags:
+    - s3_upload
