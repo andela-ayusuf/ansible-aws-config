@@ -7,7 +7,7 @@
     - boto
 
 - name: Install Boto if its uninstalled
-  pip: name=boto state=present force=yes
+  pip: name=boto state=latest
   when: boto_installed|failed
   tags:
     - boto
@@ -20,7 +20,7 @@
     - awscli
 
 - name: Install AWS CLI if its uninstalled
-  pip: name=awscli state=present force=yes
+  pip: name=awscli state=latest
   when: aws_cli_installed|failed
   tags:
     - awscli

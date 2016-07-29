@@ -1,0 +1,325 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Configuring AWS Infrastructure With CloudFormation",
+
+  "Resources": {
+
+    "S3Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "AccessControl": "PublicRead",
+        "BucketName": "bucketstjufinex00",
+        "WebsiteConfiguration": {
+          "ErrorDocument": "error.html",
+          "IndexDocument": "index.html"
+        }
+      }
+    },
+
+    "S3BucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": { "Ref": "S3Bucket" },
+        "PolicyDocument": {
+          "Statement": [{
+            "Sid": "DenyIncorrectEncryptionHeader",
+            "Effect": "Deny",
+            "Principal": "*",
+            "Action": "s3:PutObject",
+            "Resource": "arn:aws:s3:::bucketstjufinex00/*",
+            "Condition": {
+              "StringNotEquals": {
+                "s3:x-amz-server-side-encryption": "AES256"
+              }
+            }
+          }]
+        }
+      }
+    },
+
+    "VPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "EnableDnsSupport": "true",
+        "EnableDnsHostnames": "true",
+        "CidrBlock": "10.0.0.0/16",
+        "Tags": [{ "Key": "Application", "Value": { "Ref": "AWS::StackName" } }]
+      }
+    },
+
+    "NetworkAcl": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Application", "Value": { "Ref": "AWS::StackName" } }]
+      }
+    },
+
+    "NetworkAclEntry" : {
+     "Type" : "AWS::EC2::NetworkAclEntry",
+     "Properties" : {
+        "NetworkAclId" : { "Ref" : "NetworkAcl" },
+        "RuleNumber" : "100",
+        "Protocol" : "-1",
+        "RuleAction" : "allow",
+        "Egress" : "true",
+        "CidrBlock" : "0.0.0.0/0"
+     }
+    },
+
+    "SubnetNetworkAclAssociation" : {
+      "Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "PublicSubnet" },
+        "NetworkAclId" : { "Ref" : "NetworkAcl" }
+      }
+    },
+
+    "SubnetNetworkAclAssociation" : {
+      "Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "PublicSubnet2" },
+        "NetworkAclId" : { "Ref" : "NetworkAcl" }
+      }
+    },
+
+    "SubnetNetworkAclAssociation" : {
+      "Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "PrivateSubnet" },
+        "NetworkAclId" : { "Ref" : "NetworkAcl" }
+      }
+    },
+
+    "PublicSubnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": { "Ref": "VPC" },
+        "CidrBlock": "10.0.1.0/24",
+        "AvailabilityZone": "eu-west-1a",
+        "Tags": [{ "Key": "Application", "Value": { "Ref": "AWS::StackName" } }]
+      }
+    },
+
+    "PublicSubnet2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": { "Ref": "VPC" },
+        "CidrBlock": "10.0.2.0/24",
+        "AvailabilityZone": "eu-west-1b",
+        "Tags": [{ "Key": "Application", "Value": { "Ref": "AWS::StackName" } }]
+      }
+    },
+
+    "PrivateSubnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": { "Ref": "VPC" },
+        "CidrBlock": "10.0.3.0/24",
+        "AvailabilityZone": "eu-west-1a",
+        "Tags": [{ "Key": "Application", "Value": { "Ref": "AWS::StackName" } }]
+      }
+    },
+
+    "InternetGateway": {
+      "Type": "AWS::EC2::InternetGateway"
+    },
+
+    "GatewayToInternet": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": { "Ref": "VPC" },
+        "InternetGatewayId": { "Ref": "InternetGateway" }
+      }
+    },
+
+    "PublicRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": { "Ref": "VPC" }
+      }
+    },
+
+    "PublicRoute": {
+      "Type": "AWS::EC2::Route",
+      "DependsOn": "GatewayToInternet",
+      "Properties": {
+        "RouteTableId": { "Ref": "PublicRouteTable" },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": { "Ref": "InternetGateway" }
+      }
+    },
+
+    "PublicSubnetRouteTableAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": { "Ref": "PublicSubnet" },
+        "RouteTableId": { "Ref": "PublicRouteTable" }
+      }
+    },
+
+    "PublicSubnetRouteTableAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": { "Ref": "PublicSubnet2" },
+        "RouteTableId": { "Ref": "PublicRouteTable" }
+      }
+    },
+
+    "SecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "VPC Security Group",
+        "SecurityGroupIngress": [{
+          "CidrIp": "0.0.0.0/0",
+          "FromPort": "22",
+          "IpProtocol": "tcp",
+          "ToPort": "22"
+        }, {
+          "IpProtocol": "tcp",
+          "FromPort": "80",
+          "ToPort": "80",
+          "CidrIp": "0.0.0.0/0"
+        }],
+        "VpcId" : { "Ref" : "VPC" }
+      }
+    },
+
+    "LaunchConfig": {
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+      "Properties": {
+        "AssociatePublicIpAddress": "true",
+        "ImageId": "ami-9dd9b5ee",
+        "InstanceMonitoring": "false",
+        "InstanceType": "t2.micro",
+        "KeyName": "eleniyan-ireland",
+        "SecurityGroups" : [{ "Ref" : "SecurityGroup" }]
+      }
+    },
+
+    "ElasticLoadBalancer": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "DependsOn": "VPC",
+      "Properties": {
+        "SecurityGroups" : [{ "Ref" : "SecurityGroup" }],
+        "ConnectionDrainingPolicy": {
+          "Enabled": true,
+          "Timeout": 300
+        },
+        "CrossZone": true,
+        "HealthCheck": {
+          "Target": "HTTP:80/",
+          "HealthyThreshold": "3",
+          "UnhealthyThreshold": "5",
+          "Interval": "30",
+          "Timeout": "5"
+        },
+        "LoadBalancerName": "roscolb00",
+        "Listeners": [{
+          "LoadBalancerPort": "80",
+          "InstancePort": "80",
+          "Protocol": "HTTP"
+        }],
+        "Scheme": "internet-facing",
+        "Subnets": [{ "Ref": "PublicSubnet" }, { "Ref": "PublicSubnet2" }],
+        "Tags": [{ "Key": "Application", "Value": { "Ref": "AWS::StackName" } }]
+      }
+    },
+
+    "MySNSTopic": {
+      "Type": "AWS::SNS::Topic",
+      "Properties": {
+        "Subscription": [{ "Endpoint": "abdulmalik.yusuf@gmail.com", "Protocol": "email" }],
+        "TopicName": "topicoflif00"
+      }
+    },
+
+
+    "ASG": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "AvailabilityZones": ["eu-west-1a", "eu-west-1b"],
+        "DesiredCapacity": "3",
+        "HealthCheckGracePeriod": 200,
+        "HealthCheckType": "EC2",
+        "LaunchConfigurationName": { "Ref": "LaunchConfig" },
+        "LoadBalancerNames": [{ "Ref": "ElasticLoadBalancer" }],
+        "MaxSize": "5",
+        "MinSize": "2",
+        "NotificationConfigurations": [{
+          "TopicARN": { "Ref": "MySNSTopic" },
+          "NotificationTypes": [
+            "autoscaling:EC2_INSTANCE_LAUNCH",
+            "autoscaling:EC2_INSTANCE_LAUNCH_ERROR",
+            "autoscaling:EC2_INSTANCE_TERMINATE",
+            "autoscaling:EC2_INSTANCE_TERMINATE_ERROR"
+          ]
+        }],
+        "TerminationPolicies": ["OldestInstance", "OldestLaunchConfiguration", "ClosestToNextInstanceHour"],
+        "VPCZoneIdentifier": [{ "Ref": "PublicSubnet" }, { "Ref": "PublicSubnet2" }],
+        "Tags": [{
+          "Key": "Application",
+          "Value": { "Ref": "AWS::StackName" },
+          "PropagateAtLaunch": "true"
+        }]
+
+      }
+    },
+
+    "StepScaling": {
+      "Type": "AWS::AutoScaling::ScalingPolicy",
+      "Properties": {
+        "AdjustmentType": "ExactCapacity",
+        "AutoScalingGroupName": { "Ref": "ASG" },
+        "PolicyType": "StepScaling",
+        "MetricAggregationType": "Average",
+        "EstimatedInstanceWarmup": "60",
+        "StepAdjustments": [{
+          "MetricIntervalLowerBound": "0",
+          "MetricIntervalUpperBound": "50",
+          "ScalingAdjustment": "1"
+        }, {
+          "MetricIntervalLowerBound": "50",
+          "ScalingAdjustment": "1"
+        }]
+      }
+    },
+
+    "CPUAlarmHigh": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "EvaluationPeriods": "1",
+        "Statistic": "Average",
+        "Threshold": "10",
+        "AlarmDescription": "Instance is down/ CPUUtilization IS HIGH!",
+        "Period": "60",
+        "AlarmActions": [{ "Ref": "StepScaling" }],
+        "Namespace": "AWS/EC2",
+        "Dimensions": [{
+          "Name": "AutoScalingGroupName",
+          "Value": { "Ref": "ASG" }
+        }],
+        "ComparisonOperator": "GreaterThanThreshold",
+        "MetricName": "CPUUtilization"
+      }
+    },
+
+    "PrivateInstance": {
+      "Type": "AWS::EC2::Instance",
+      "DependsOn": "GatewayToInternet",
+      "Properties": {
+        "AvailabilityZone": "eu-west-1a",
+        "InstanceType": "t2.micro",
+        "ImageId": "ami-9dd9b5ee",
+        "KeyName": "eleniyan-ireland",
+        "NetworkInterfaces": [{
+          "AssociatePublicIpAddress": "true",
+          "DeviceIndex": "0",
+          "DeleteOnTermination": "true",
+          "SubnetId": { "Ref": "PrivateSubnet" }
+        }]
+      }
+    }
+
+  }
+}

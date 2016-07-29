@@ -63,7 +63,7 @@
         "Protocol" : "-1",
         "RuleAction" : "allow",
         "Egress" : "true",
-        "CidrBlock" : "0.0.0.0/0"
+        "CidrBlock" : "{{ network_acl_cidr }}"
      }
     },
 
@@ -171,7 +171,7 @@
       "Properties": {
         "GroupDescription": "VPC Security Group",
         "SecurityGroupIngress": [{
-          "CidrIp": "0.0.0.0/0",
+          "CidrIp": "{{ security_group_cidr }}",
           "FromPort": "22",
           "IpProtocol": "tcp",
           "ToPort": "22"
@@ -179,7 +179,7 @@
           "IpProtocol": "tcp",
           "FromPort": "80",
           "ToPort": "80",
-          "CidrIp": "0.0.0.0/0"
+          "CidrIp": "{{ security_group_cidr }}"
         }],
         "VpcId" : { "Ref" : "VPC" }
       }
@@ -189,7 +189,7 @@
       "Type": "AWS::AutoScaling::LaunchConfiguration",
       "Properties": {
         "AssociatePublicIpAddress": "true",
-        "ImageId":"ami_id",
+        "ImageId": "{{ created_ami_id.results[0].ami_id}}",
         "InstanceMonitoring": "false",
         "InstanceType": "{{ launch_config_instance_type }}",
         "KeyName": "{{ key_pair_name }}",
@@ -310,7 +310,7 @@
       "Properties": {
         "AvailabilityZone": "{{ availability_zone1 }}",
         "InstanceType": "{{ launch_config_instance_type }}",
-        "ImageId":"ami_id",
+        "ImageId": "{{ created_ami_id.results[0].ami_id }}",
         "KeyName": "{{ key_pair_name }}",
         "NetworkInterfaces": [{
           "AssociatePublicIpAddress": "true",
