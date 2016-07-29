@@ -1,41 +1,49 @@
 # ANSIBLE-AWS-CONFIG
-This Ansible playbook allows you to:
-- Create a Server-Side encrypted S3 bucket on Amazon AWS and upload data to it
-- Host a static website on Amazon AWS using Amazon S3
-- Create a Virtual Private Cloud(VPC) with a private & public subnet on Amazon AWS using AWS Cloudformation
-- Create an Amazone Machine Image
-- Launch EC2 instances with the machine image created previously in an Autoscaling group
+This Ansible playbook:
+- Creates Server-Side encrypted S3 bucket using AWS S3 managed encryption keys
+- Uploads encrypted data to the S3 bucket above
+- Set up a static website using the same S3 bucket
+- Creates a Virtual Private Cloud(VPC) with multiple subnets in different Availability Zones(AZ).
+- Creates Network Access Control List(NACL) and Security Group. 
+- Creates a Amazon Machine Image(AMI).
+- Creates an Auto Scaling Group(ASG) using the Launch Config created below.
+- Creates a Launch Configuration using the AMI created above.
+- Sets up AWS Cloud Watch, Cloud Watch Alarm and SNS Topic.
 
 **Requirements**
 
-Before running this playbook, you must have Python >= 2.6 installed on your local machine. Head over [here](http://docs.python-guide.org/en/latest/starting/install/osx/) to install Python.
-
-Running the playbook wil install the other requirements -Boto and AWS CLI- if you don't have them installed.
+- Before running this playbook, you must have Python >= 2.6 installed on your local machine. Head over [here](http://docs.python-guide.org/en/latest/starting/install/osx/) to install Python.
+- AWS Access and Secret Keys.
 
 **Clone The Project**
 ```
 git clone https://github.com/andela-ayusuf/ansible-aws-config.git
 ```
 
-**S3 Bucket Policy**
+**Variables**
 
-In order to create a Server-Side Encryption with Amazon S3-Managed Encryption Keys (SSE-S3) on our Amazon S3 bucket, we will need a bucket policy. An example can be found [here](http://docs.aws.amazon.com/AmazonS3/latest/dev/UsingServerSideEncryption.html).
+You will need to update the variables files i.e. **vars.yml** and **vars.rb** files with the appropriate variables. Currently there are only dummy variables in the variable files and this will not work.
 
-
-The policy will be placed in the root of the project in a file named **policy.json**
-
-
-**Variables and AWS Access and Secret Keys**
-
-In the variables files i.e. the **vars.yml** file in the root directory of this project, we will need to enter our Access and Secret Keys which can be obtained from AWS [here](https://console.aws.amazon.com/iam/home?region=us-west-1#home). It is also required that we fill in other variables which will be used in creating our AWS resources.
 
 **Running The Project**
 
-Well, this is the part we've been waiting for, right? :)
-
-From your terminal, enter:
+From your terminal, enter into this project directory:
 
 ```
 $ cd ansible-aws-config
+```
+Run the playbook:
+```
 $ ansible-playbook playbook.aws.yml
 ```
+OR
+```
+$ cucumber features/config.feature
+```
+And with that done, we have an applications's infrastructure set up on AWS.
+
+**Issues**
+
+If you happen to run into any problems while using this playbook or you would like to make contributions to it, please endeavour to open an issue [here](https://github.com/andela-ayusuf/ansible-aws-config/issues).
+
+Best regards :)
